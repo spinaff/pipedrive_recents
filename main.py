@@ -7,9 +7,10 @@ import pandas as pd
 import unicodedata
 import re
 from datetime import datetime, timedelta
+from fastapi import FastAPI, Query
 
-cred={  "type": "service_account",  "project_id": "ng-feedz",  "private_key_id": "baf5776ec951a88a70014b93b9701f5fd449d17a",  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDov6WFU6BDl33C\nHWyQ/ze0W8OsU+J3hMMavCaT86pStEw7sPhXeXL6kqj8mV6bwBas5NpHHZcAsGIF\nFQlBoc6kDK58a7Tua7UJbYXP7NAiARP9Ua0IPNBT0nJDOoabY6akJTfyFbDFRzYw\nHWFxSwI/tSG45xsg/VOD8irtWAMYxTl1k1fsewQVcj/QZ9sC/K2HF8hfe6SRgwFe\nWbwmV1rkCBC8QVCEZmAFAyrDu13W+fxM4xQFZ9OfdtwBYP3NSAnvd8CefzGowcWF\n6aCTCKxLx1o56fSrqNJA67NSYIGZTugaNbGUvD6tjRAaJkqoKuj1zPkk/0yEbmUq\nZFSywGWVAgMBAAECggEADFbgvR1OYVb+PVTXBSbqup6k1JWL6583wsqX1v8zl/fk\nFMQQnn6bWGp/GAk/iU1ZRmhJpDyO3WP8hl1zpK2h6XOcqo8BRCSkr+/FCN16uVrK\nRwNWA5pJxy/gi+zl5wYU9x3cBfMdcJAScOGV4W5DG8KMG6Pw/cJAc73ahcPFQkJU\noSskPFEtlpJjc6+yMS7IhLzUZd+UJxZAqbHdrVyMQ1WYhGPnc7SgFJIEnIFBsHbO\nkJhX895jxKOk2B9ZeoKEVQvBySoji5bbepML4EhI/0tEH74VBNxAHGsJqRc5EsWR\ntG5EkTZKZ6hl/6vtVPD2+6iAvATrBBuPa+tdUMxfoQKBgQD7edVS3T+Qm91J4MQB\nm7L0tyvVjng8YUIrFrME1gEUbPaLIXOslo0krIgn2icX74Mbyd5guQXIPCamhgJO\nfZaB8553qjk07CJKYSjJBBKVVQvjO7nUt7Ybx9QjfnDeCabhyR74NkBwNZ+Khc84\nDZsDVEuWfvqZkIuEgIj7OtraxQKBgQDs75CtT2Bx+6DSRQYcKop4tZemI0dDmCYJ\nO7aHoFYn0rMTVB0KtEMgEdnvKiHe/obAueqdQKSHwdBgO7uyrJEpHdhpyMVmmQGL\nLIZOoyyqbYV2spPUuu/g049JFf+dhRKkEJ7+qpF/HogzYnbm6+Hx47UnOWc+NJJF\nFyO48fhMkQKBgEqVNrSN0+VipL3dgKRtdiToEoMS7wwRWFuJLuz3P3i8XF6lPDZq\nrE+9L+CJ7eBGc98Q/vg2x8U8OcZXpmV7D+FYzJ33CWJtyjm/GSaNI6nQgGcTdqjl\nF4ijuoIQZQ8lU65RRPMeu/vLm5as2uln95qELKrk3BQhb4+Lw5SnPvN1AoGAVyz5\nzVqEQMv1awgsbFaWpj0iM+WNBejILeODkDlFGdfjPXxYRyT2Aamvxth4p+R8ThLZ\nqMws/Sopcg7oS6BEtJ0fkCRnxQ0MzVkvfWV6PKaZUYf47m9tbQpKEPkAGMPqjOT0\nqvy1FdF1CXr0BpjJhEdk0q7DNtb+7l7KLPUSh5ECgYAKf98+0vQPhphcz/xfgzXZ\ntzZE2v/NDxnfB4/TC328TmzTV/kNLydrq15Lk4z9v7Usquc2nL6QsnhPG/FGjfv5\nG+38o70tOBLFPh6FGFRI84nzqGSJGY1dRFYx0kBuhdI/gfzkksgN/wp/E+Cl6AW/\nNnRB0nHv5ZTu17w6e9J1GA==\n-----END PRIVATE KEY-----\n",  "client_email": "bq-connector-feedz@ng-feedz.iam.gserviceaccount.com",  "client_id": "102419887162545136368",  "auth_uri": "https://accounts.google.com/o/oauth2/auth",  "token_uri": "https://oauth2.googleapis.com/token",  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/bq-connector-feedz%40ng-feedz.iam.gserviceaccount.com",  "universe_domain": "googleapis.com"}
-credentials = service_account.Credentials.from_service_account_info(cred)
+
+app = FastAPI()
 
 def get_table_schema(client, project_id, dataset_id, table_id):
     # Obtendo a tabela
@@ -323,7 +324,13 @@ def recent_atividades(timestamp,caminho,chave,tabela,dataset):
     # Atualizando a tabela no BigQuery
     update_bigquery_table(atualiza, datasetID,table_id,lista)
 
-if __name__ == "__main__":
+@app.get("/run_recents")
+def run_recent():
     time_now=tres_horas_atras_formatado()
     recent_deals(time_now,"https://feedz.pipedrive.com","eb0a9b51a720dd07f0921beedac1bf441b2cc476","Pipedrive_Deals","PipedrivePy")
-    recent_atividades(time_now,"https://feedz.pipedrive.com","eb0a9b51a720dd07f0921beedac1bf441b2cc476","Pipedrive_Activities","PipedrivePy")
+    recent_atividades(time_now,"https://feedz.pipedrive.com","eb0a9b51a720dd07f0921beedac1bf441b2cc476","Pipedrive_Activities","PipedrivePy")  
+    return "Tabelas Atualizadas"
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8080)
