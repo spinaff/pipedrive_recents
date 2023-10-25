@@ -6,10 +6,29 @@ import json
 import pandas as pd
 import unicodedata
 import re
+from datetime import datetime, timedelta
 
-cred={'type': 'service_account', 'project_id': 'sys-67738525349545571962304921', 'private_key_id': '91927d3950bfa5e5249a0cc4f42d4625a99f4503', 'private_key': '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC1BaE36Via8sak\noerV17EZzGlXeBjgsscbVnLuyg6ACDlY7CrCljjdOfmn+4gKbe1491WwJtxuhr/0\ne4od5jt2HrKTfR5yiFb3EujfcZrl7kA8OPnSp7Z5StZoos4AHAMJBcgGGMfbHVA4\nQ+ZPjXXSIGWJdh8/SV0Es51VUQi+Lms3YK0fzufME4qceS9nybYmm3ccrZSG51zn\nhK7SNmRZZCZIfOQGmXa/hqZw17B1TFKIR9PefkYtWI8yTOvsZ6crzttiouQzulOl\n5DQwmbfOeEWMKT6HoXPTa+V381S7WRAK8YF98+DVqerjBPt3DND+/YL2ZwA/zqJz\ne5iz2D7jAgMBAAECggEADbW48ZabLtUPRV27/ukgkR8hpU3DuJThrojcGIi2E21M\nBpeQX39oHB0tctMCiSOtNhmpZDd1P2u2Mwp+Oeh7fWUyyifSPANmbr0AZRfiDuL9\n+3GnPhSUpdgMqA0Yg/qbIj5NWWTcEhTExBYkZccFct4gQopvMGhagqYl1tXVzy1t\nNpE0Ge+uishasM0AE0c6eGppyfm7zb/Df0Q6vDfmGHSiO4WCwLjUm9BayGS68Pt1\n7MTOqO3B5Eo4KTcahCY41+iXvu8K2EZ1DRRS9xvBs0pBqK68fSuQSMSUzF18CHzb\n5tg/OgLWQxiSs8jOLUHox6k4dkF2NejqYh3plCsnQQKBgQDYjtcAWlbCalDKWjX8\noV3YOuwY1LrhsF8IuCnynkAlKKrleZHmbFubrYN6C1GDKo4QPM5j7IuHRXEz8Pfv\nsym9VJPeOqE0NBy8HQV3NtLzwypaNUlGi250uSEpddSS7p0AL7p5mhSet9aTSdBq\n6cSVbm13GFkjoFvwir+kEFRCwQKBgQDV/ea10Npmf8IBKO23d5Is5xMvHry8MzZI\noVpFWPym5HS5XEA06APDd3ccyCndDcJQAJld6C3CLbTxZdWhg2WGSpWnBarlSVQh\nUcRawHAMvSR0VGeUjOuQvNecutpEx5u6qs2AaT7kj2fQyOnH3Ux1w+GbtytdhOfI\nyBjIgsc+owKBgGrlZ1+3OChTjnm0Of3wMYCw5SYErBMHmoGVVq96SjONdX48mjZh\nun6IEeRGff//G40MVtygQOeO8agwBFL/31Sj0THbQwOfzadVtAL6vvqwldFdiEQY\nQ3e+go4SqdG1ky4qYSPxWMhX+sVNpGGB7xXMIqCtFiMt3vRHqP11SgKBAoGBAIDk\n3Xl4YoTIwV+XepA+6oI3cVu5hO9LXZAj+E67CfuwsgoQYfA8LEApjkp82pJ2visY\nIUjqF93VUB7zOtl9XsKj3D5tcIGJSK6FJOOQ9C0IJJQZXwagVyeoR6r09ZHmNYwb\nY4rMWgCrzFl7Gy2yw2JP6W20x98dtcs/k4X7F+5HAoGAXLQcxSEn3yDqYcqqihTd\nCwwj/C8PCVtExuY2nbd5K72G6DeJOzqq5XRAYM+ONPlofSBioVXtxTMvdKDTR8xY\njnuU/XunKfMBJfboGxXkdHL7LJNuqE8DRG3El+TFGA/aCjFSLAKZyYGmD7H2FXr4\nVYxLh0cycwfaBLeKUC9Sg2A=\n-----END PRIVATE KEY-----\n', 'client_email': 'python-2@sys-67738525349545571962304921.iam.gserviceaccount.com', 'client_id': '116817448104344134353', 'auth_uri': 'https://accounts.google.com/o/oauth2/auth', 'token_uri': 'https://oauth2.googleapis.com/token', 'auth_provider_x509_cert_url': 'https://www.googleapis.com/oauth2/v1/certs', 'client_x509_cert_url': 'https://www.googleapis.com/robot/v1/metadata/x509/python-2%40sys-67738525349545571962304921.iam.gserviceaccount.com', 'universe_domain': 'googleapis.com'}
+cred={  "type": "service_account",  "project_id": "ng-feedz",  "private_key_id": "baf5776ec951a88a70014b93b9701f5fd449d17a",  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDov6WFU6BDl33C\nHWyQ/ze0W8OsU+J3hMMavCaT86pStEw7sPhXeXL6kqj8mV6bwBas5NpHHZcAsGIF\nFQlBoc6kDK58a7Tua7UJbYXP7NAiARP9Ua0IPNBT0nJDOoabY6akJTfyFbDFRzYw\nHWFxSwI/tSG45xsg/VOD8irtWAMYxTl1k1fsewQVcj/QZ9sC/K2HF8hfe6SRgwFe\nWbwmV1rkCBC8QVCEZmAFAyrDu13W+fxM4xQFZ9OfdtwBYP3NSAnvd8CefzGowcWF\n6aCTCKxLx1o56fSrqNJA67NSYIGZTugaNbGUvD6tjRAaJkqoKuj1zPkk/0yEbmUq\nZFSywGWVAgMBAAECggEADFbgvR1OYVb+PVTXBSbqup6k1JWL6583wsqX1v8zl/fk\nFMQQnn6bWGp/GAk/iU1ZRmhJpDyO3WP8hl1zpK2h6XOcqo8BRCSkr+/FCN16uVrK\nRwNWA5pJxy/gi+zl5wYU9x3cBfMdcJAScOGV4W5DG8KMG6Pw/cJAc73ahcPFQkJU\noSskPFEtlpJjc6+yMS7IhLzUZd+UJxZAqbHdrVyMQ1WYhGPnc7SgFJIEnIFBsHbO\nkJhX895jxKOk2B9ZeoKEVQvBySoji5bbepML4EhI/0tEH74VBNxAHGsJqRc5EsWR\ntG5EkTZKZ6hl/6vtVPD2+6iAvATrBBuPa+tdUMxfoQKBgQD7edVS3T+Qm91J4MQB\nm7L0tyvVjng8YUIrFrME1gEUbPaLIXOslo0krIgn2icX74Mbyd5guQXIPCamhgJO\nfZaB8553qjk07CJKYSjJBBKVVQvjO7nUt7Ybx9QjfnDeCabhyR74NkBwNZ+Khc84\nDZsDVEuWfvqZkIuEgIj7OtraxQKBgQDs75CtT2Bx+6DSRQYcKop4tZemI0dDmCYJ\nO7aHoFYn0rMTVB0KtEMgEdnvKiHe/obAueqdQKSHwdBgO7uyrJEpHdhpyMVmmQGL\nLIZOoyyqbYV2spPUuu/g049JFf+dhRKkEJ7+qpF/HogzYnbm6+Hx47UnOWc+NJJF\nFyO48fhMkQKBgEqVNrSN0+VipL3dgKRtdiToEoMS7wwRWFuJLuz3P3i8XF6lPDZq\nrE+9L+CJ7eBGc98Q/vg2x8U8OcZXpmV7D+FYzJ33CWJtyjm/GSaNI6nQgGcTdqjl\nF4ijuoIQZQ8lU65RRPMeu/vLm5as2uln95qELKrk3BQhb4+Lw5SnPvN1AoGAVyz5\nzVqEQMv1awgsbFaWpj0iM+WNBejILeODkDlFGdfjPXxYRyT2Aamvxth4p+R8ThLZ\nqMws/Sopcg7oS6BEtJ0fkCRnxQ0MzVkvfWV6PKaZUYf47m9tbQpKEPkAGMPqjOT0\nqvy1FdF1CXr0BpjJhEdk0q7DNtb+7l7KLPUSh5ECgYAKf98+0vQPhphcz/xfgzXZ\ntzZE2v/NDxnfB4/TC328TmzTV/kNLydrq15Lk4z9v7Usquc2nL6QsnhPG/FGjfv5\nG+38o70tOBLFPh6FGFRI84nzqGSJGY1dRFYx0kBuhdI/gfzkksgN/wp/E+Cl6AW/\nNnRB0nHv5ZTu17w6e9J1GA==\n-----END PRIVATE KEY-----\n",  "client_email": "bq-connector-feedz@ng-feedz.iam.gserviceaccount.com",  "client_id": "102419887162545136368",  "auth_uri": "https://accounts.google.com/o/oauth2/auth",  "token_uri": "https://oauth2.googleapis.com/token",  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/bq-connector-feedz%40ng-feedz.iam.gserviceaccount.com",  "universe_domain": "googleapis.com"}
 credentials = service_account.Credentials.from_service_account_info(cred)
 
+def get_table_schema(client, project_id, dataset_id, table_id):
+    # Obtendo a tabela
+    table_ref = bigquery.dataset.DatasetReference(project_id, dataset_id).table(table_id)
+    table = client.get_table(table_ref)
+
+    # Retornando o esquema
+    return table.schema
+
+def tres_horas_atras_formatado():
+    # Obtém o horário atual
+    horario_atual = datetime.now()
+
+    # Subtrai 3 horas do horário atual
+    tres_horas_atras = horario_atual - timedelta(hours=3)
+
+    # Formata a data e hora
+    formato = "%Y-%m-%d %H:%M:%S"
+    return tres_horas_atras.strftime(formato)
 
 def get_data_from_pipedrive(url, token, timestamp,item, max_attempts=3, params=None):
     all_data = []
@@ -65,8 +84,8 @@ def get_data_from_pipedrive(url, token, timestamp,item, max_attempts=3, params=N
 
 def update_bigquery_table(data, datasetID ,table_id,lista):
     # Inicializa o cliente do BigQuery
-    projectID = 'sys-67738525349545571962304921'
-    cred={'type': 'service_account', 'project_id': 'sys-67738525349545571962304921', 'private_key_id': '91927d3950bfa5e5249a0cc4f42d4625a99f4503', 'private_key': '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC1BaE36Via8sak\noerV17EZzGlXeBjgsscbVnLuyg6ACDlY7CrCljjdOfmn+4gKbe1491WwJtxuhr/0\ne4od5jt2HrKTfR5yiFb3EujfcZrl7kA8OPnSp7Z5StZoos4AHAMJBcgGGMfbHVA4\nQ+ZPjXXSIGWJdh8/SV0Es51VUQi+Lms3YK0fzufME4qceS9nybYmm3ccrZSG51zn\nhK7SNmRZZCZIfOQGmXa/hqZw17B1TFKIR9PefkYtWI8yTOvsZ6crzttiouQzulOl\n5DQwmbfOeEWMKT6HoXPTa+V381S7WRAK8YF98+DVqerjBPt3DND+/YL2ZwA/zqJz\ne5iz2D7jAgMBAAECggEADbW48ZabLtUPRV27/ukgkR8hpU3DuJThrojcGIi2E21M\nBpeQX39oHB0tctMCiSOtNhmpZDd1P2u2Mwp+Oeh7fWUyyifSPANmbr0AZRfiDuL9\n+3GnPhSUpdgMqA0Yg/qbIj5NWWTcEhTExBYkZccFct4gQopvMGhagqYl1tXVzy1t\nNpE0Ge+uishasM0AE0c6eGppyfm7zb/Df0Q6vDfmGHSiO4WCwLjUm9BayGS68Pt1\n7MTOqO3B5Eo4KTcahCY41+iXvu8K2EZ1DRRS9xvBs0pBqK68fSuQSMSUzF18CHzb\n5tg/OgLWQxiSs8jOLUHox6k4dkF2NejqYh3plCsnQQKBgQDYjtcAWlbCalDKWjX8\noV3YOuwY1LrhsF8IuCnynkAlKKrleZHmbFubrYN6C1GDKo4QPM5j7IuHRXEz8Pfv\nsym9VJPeOqE0NBy8HQV3NtLzwypaNUlGi250uSEpddSS7p0AL7p5mhSet9aTSdBq\n6cSVbm13GFkjoFvwir+kEFRCwQKBgQDV/ea10Npmf8IBKO23d5Is5xMvHry8MzZI\noVpFWPym5HS5XEA06APDd3ccyCndDcJQAJld6C3CLbTxZdWhg2WGSpWnBarlSVQh\nUcRawHAMvSR0VGeUjOuQvNecutpEx5u6qs2AaT7kj2fQyOnH3Ux1w+GbtytdhOfI\nyBjIgsc+owKBgGrlZ1+3OChTjnm0Of3wMYCw5SYErBMHmoGVVq96SjONdX48mjZh\nun6IEeRGff//G40MVtygQOeO8agwBFL/31Sj0THbQwOfzadVtAL6vvqwldFdiEQY\nQ3e+go4SqdG1ky4qYSPxWMhX+sVNpGGB7xXMIqCtFiMt3vRHqP11SgKBAoGBAIDk\n3Xl4YoTIwV+XepA+6oI3cVu5hO9LXZAj+E67CfuwsgoQYfA8LEApjkp82pJ2visY\nIUjqF93VUB7zOtl9XsKj3D5tcIGJSK6FJOOQ9C0IJJQZXwagVyeoR6r09ZHmNYwb\nY4rMWgCrzFl7Gy2yw2JP6W20x98dtcs/k4X7F+5HAoGAXLQcxSEn3yDqYcqqihTd\nCwwj/C8PCVtExuY2nbd5K72G6DeJOzqq5XRAYM+ONPlofSBioVXtxTMvdKDTR8xY\njnuU/XunKfMBJfboGxXkdHL7LJNuqE8DRG3El+TFGA/aCjFSLAKZyYGmD7H2FXr4\nVYxLh0cycwfaBLeKUC9Sg2A=\n-----END PRIVATE KEY-----\n', 'client_email': 'python-2@sys-67738525349545571962304921.iam.gserviceaccount.com', 'client_id': '116817448104344134353', 'auth_uri': 'https://accounts.google.com/o/oauth2/auth', 'token_uri': 'https://oauth2.googleapis.com/token', 'auth_provider_x509_cert_url': 'https://www.googleapis.com/oauth2/v1/certs', 'client_x509_cert_url': 'https://www.googleapis.com/robot/v1/metadata/x509/python-2%40sys-67738525349545571962304921.iam.gserviceaccount.com', 'universe_domain': 'googleapis.com'}
+    projectID = 'ng-feedz'
+    cred={  "type": "service_account",  "project_id": "ng-feedz",  "private_key_id": "baf5776ec951a88a70014b93b9701f5fd449d17a",  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDov6WFU6BDl33C\nHWyQ/ze0W8OsU+J3hMMavCaT86pStEw7sPhXeXL6kqj8mV6bwBas5NpHHZcAsGIF\nFQlBoc6kDK58a7Tua7UJbYXP7NAiARP9Ua0IPNBT0nJDOoabY6akJTfyFbDFRzYw\nHWFxSwI/tSG45xsg/VOD8irtWAMYxTl1k1fsewQVcj/QZ9sC/K2HF8hfe6SRgwFe\nWbwmV1rkCBC8QVCEZmAFAyrDu13W+fxM4xQFZ9OfdtwBYP3NSAnvd8CefzGowcWF\n6aCTCKxLx1o56fSrqNJA67NSYIGZTugaNbGUvD6tjRAaJkqoKuj1zPkk/0yEbmUq\nZFSywGWVAgMBAAECggEADFbgvR1OYVb+PVTXBSbqup6k1JWL6583wsqX1v8zl/fk\nFMQQnn6bWGp/GAk/iU1ZRmhJpDyO3WP8hl1zpK2h6XOcqo8BRCSkr+/FCN16uVrK\nRwNWA5pJxy/gi+zl5wYU9x3cBfMdcJAScOGV4W5DG8KMG6Pw/cJAc73ahcPFQkJU\noSskPFEtlpJjc6+yMS7IhLzUZd+UJxZAqbHdrVyMQ1WYhGPnc7SgFJIEnIFBsHbO\nkJhX895jxKOk2B9ZeoKEVQvBySoji5bbepML4EhI/0tEH74VBNxAHGsJqRc5EsWR\ntG5EkTZKZ6hl/6vtVPD2+6iAvATrBBuPa+tdUMxfoQKBgQD7edVS3T+Qm91J4MQB\nm7L0tyvVjng8YUIrFrME1gEUbPaLIXOslo0krIgn2icX74Mbyd5guQXIPCamhgJO\nfZaB8553qjk07CJKYSjJBBKVVQvjO7nUt7Ybx9QjfnDeCabhyR74NkBwNZ+Khc84\nDZsDVEuWfvqZkIuEgIj7OtraxQKBgQDs75CtT2Bx+6DSRQYcKop4tZemI0dDmCYJ\nO7aHoFYn0rMTVB0KtEMgEdnvKiHe/obAueqdQKSHwdBgO7uyrJEpHdhpyMVmmQGL\nLIZOoyyqbYV2spPUuu/g049JFf+dhRKkEJ7+qpF/HogzYnbm6+Hx47UnOWc+NJJF\nFyO48fhMkQKBgEqVNrSN0+VipL3dgKRtdiToEoMS7wwRWFuJLuz3P3i8XF6lPDZq\nrE+9L+CJ7eBGc98Q/vg2x8U8OcZXpmV7D+FYzJ33CWJtyjm/GSaNI6nQgGcTdqjl\nF4ijuoIQZQ8lU65RRPMeu/vLm5as2uln95qELKrk3BQhb4+Lw5SnPvN1AoGAVyz5\nzVqEQMv1awgsbFaWpj0iM+WNBejILeODkDlFGdfjPXxYRyT2Aamvxth4p+R8ThLZ\nqMws/Sopcg7oS6BEtJ0fkCRnxQ0MzVkvfWV6PKaZUYf47m9tbQpKEPkAGMPqjOT0\nqvy1FdF1CXr0BpjJhEdk0q7DNtb+7l7KLPUSh5ECgYAKf98+0vQPhphcz/xfgzXZ\ntzZE2v/NDxnfB4/TC328TmzTV/kNLydrq15Lk4z9v7Usquc2nL6QsnhPG/FGjfv5\nG+38o70tOBLFPh6FGFRI84nzqGSJGY1dRFYx0kBuhdI/gfzkksgN/wp/E+Cl6AW/\nNnRB0nHv5ZTu17w6e9J1GA==\n-----END PRIVATE KEY-----\n",  "client_email": "bq-connector-feedz@ng-feedz.iam.gserviceaccount.com",  "client_id": "102419887162545136368",  "auth_uri": "https://accounts.google.com/o/oauth2/auth",  "token_uri": "https://oauth2.googleapis.com/token",  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/bq-connector-feedz%40ng-feedz.iam.gserviceaccount.com",  "universe_domain": "googleapis.com"}
     credentials = service_account.Credentials.from_service_account_info(cred)
     client = bigquery.Client(project=projectID, credentials=credentials)
 
@@ -96,19 +115,22 @@ def update_bigquery_table(data, datasetID ,table_id,lista):
     #table_id_full = f"{projectID}.{datasetID}.{table_id}"
     
     df = pd.DataFrame(data)
+    json_data = df.to_json(orient = 'records')
+    json_object = json.loads(json_data)
 
     # for i in df.columns:print(i)
+    schema=get_table_schema(client, projectID, datasetID, table_id)
 
     # Carregar os dados do DataFrame diretamente no BigQuery
     table_ref = f"{projectID}.{dataset['dataset_id']}.{dataset['table_id']}"
-    load_config = bigquery.LoadJobConfig()
-    #load_config.source_format = bigquery.SourceFormat.PARQUET
-    #load_config.max_bad_records = 100
+    load_config = bigquery.LoadJobConfig(schema=schema)
+    load_config.source_format = bigquery.SourceFormat.NEWLINE_DELIMITED_JSON
+    load_config.max_bad_records = 100
     #load_config.autodetect = True
-    #load_config.write_disposition = bigquery.WriteDisposition.WRITE_TRUNCATE
+    #load_config.write_disposition = bigquery.WriteDisposition.WRITE_APPEND
 
     # try:
-    job = client.load_table_from_dataframe(df, table_ref, job_config=load_config)
+    job = client.load_table_from_json(json_object, table_ref, job_config=load_config)
     job.result()  # Wait for the loading job to complete
     return {"message": "Data successfully inserted into BigQuery"}
     # except Exception as e:
@@ -221,13 +243,14 @@ def extrair_valores(lista_dicionarios, chave):
 def lista_para_texto(lista):
     return f"({', '.join(map(str, lista))})"
 
-def recent_deals():
+def recent_deals(timestamp,caminho,chave,tabela,dataset):
     # Definindo os valores
-    url = "https://feedz.pipedrive.com"
-    token = "eb0a9b51a720dd07f0921beedac1bf441b2cc476"
-    timestamp = "2023-10-23 00:00:00"
-    table_id = "pipedrive_deals"
-    datasetID = 'TESTESCRIPT'
+    url = caminho
+    token = chave
+    timestamp = timestamp
+    table_id = tabela
+    datasetID = dataset
+    datasetID = 'PipedrivePy'
     item="deal"
 
     # Buscando dados do Pipedrive
@@ -259,19 +282,19 @@ def recent_deals():
     remove_keys_from_list_of_dicts(atualiza, keys_to_remove)
     
     # Tratando os dados
-    df = pd.DataFrame(atualiza)
-    df.to_csv('output.csv', index=False)
+    # df = pd.DataFrame(atualiza)
+    # df.to_csv('output.csv', index=False)
 
     # Atualizando a tabela no BigQuery
     update_bigquery_table(atualiza, datasetID,table_id,lista)
 
-def recent_atividades():
+def recent_atividades(timestamp,caminho,chave,tabela,dataset):
     # Definindo os valores
-    url = "https://feedz.pipedrive.com"
-    token = "eb0a9b51a720dd07f0921beedac1bf441b2cc476"
-    timestamp = "2023-10-23 00:00:00"
-    table_id = "pipedrive_activities"
-    datasetID = 'TESTESCRIPT'
+    url = caminho
+    token = chave
+    timestamp = timestamp
+    table_id = tabela
+    datasetID = dataset
     item="activity"
 
     # Buscando dados do Pipedrive
@@ -289,6 +312,8 @@ def recent_atividades():
 
     # df = pd.DataFrame(atualiza)
     # df.to_csv('output.csv', index=False)
+    keys_to_remove_2 = ['file', 'lead']
+    remove_keys_from_list_of_dicts(atualiza, keys_to_remove_2)
 
 
     
@@ -299,5 +324,6 @@ def recent_atividades():
     update_bigquery_table(atualiza, datasetID,table_id,lista)
 
 if __name__ == "__main__":
-    recent_deals()
-    recent_atividades()
+    time_now=tres_horas_atras_formatado()
+    recent_deals(time_now,"https://feedz.pipedrive.com","eb0a9b51a720dd07f0921beedac1bf441b2cc476","Pipedrive_Deals","PipedrivePy")
+    recent_atividades(time_now,"https://feedz.pipedrive.com","eb0a9b51a720dd07f0921beedac1bf441b2cc476","Pipedrive_Activities","PipedrivePy")
